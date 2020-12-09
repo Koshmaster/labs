@@ -10,6 +10,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.font.FontRenderContext;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DecimalFormat;
@@ -26,10 +28,12 @@ public class GraphicsDisplay extends JPanel {
     private double maxX;
     private double minY;
     private double maxY;
+    private double scale;
     private double[][] viewport = new double[2][2];
     private ArrayList<double[][]> undoHistory = new ArrayList(5);
     private double scaleX;
     private double scaleY;
+    private BasicStroke graphicsStroke;
     private BasicStroke axisStroke;
     private BasicStroke gridStroke;
     private BasicStroke markerStroke;
@@ -44,11 +48,18 @@ public class GraphicsDisplay extends JPanel {
 
     public GraphicsDisplay() {
         this.setBackground(Color.WHITE);
-        this.axisStroke = new BasicStroke(2.0F, 0, 0, 10.0F, (float[])null, 0.0F);
+        graphicsStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_ROUND, 10.0f, new float[]{12,3, 12, 3, 12, 3, 3,3, 3,3 , 3,3}, 0.0f);
+// Перо для рисования осей координат
+        axisStroke = new BasicStroke(2.0f, BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
+// Перо для рисования контуров маркеров
+        markerStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
+                BasicStroke.JOIN_MITER, 10.0f, null, 0.0f);
+// Шрифт для подписей осей координат
+        axisFont = new Font("Serif", Font.BOLD, 36);
         this.gridStroke = new BasicStroke(1.0F, 0, 0, 10.0F, new float[]{4.0F, 4.0F}, 0.0F);
-        this.markerStroke = new BasicStroke(1.0F, 0, 0, 10.0F, (float[])null, 0.0F);
         this.selectionStroke = new BasicStroke(1.0F, 0, 0, 10.0F, new float[]{10.0F, 10.0F}, 0.0F);
-        this.axisFont = new Font("Serif", 1, 36);
         this.labelsFont = new Font("Serif", 0, 10);
         formatter.setMaximumFractionDigits(5);
         this.addMouseListener(new GraphicsDisplay.MouseHandler());
@@ -96,6 +107,7 @@ public class GraphicsDisplay extends JPanel {
         super.paintComponent(g);
         this.scaleX = this.getSize().getWidth() / (this.viewport[1][0] - this.viewport[0][0]);
         this.scaleY = this.getSize().getHeight() / (this.viewport[0][1] - this.viewport[1][1]);
+        scale = Math.min(scaleX, scaleY);
         if (this.graphicsData != null && this.graphicsData.size() != 0) {
             Graphics2D canvas = (Graphics2D)g;
             this.paintGrid(canvas);
@@ -154,10 +166,24 @@ public class GraphicsDisplay extends JPanel {
                 } else {
                     radius = 3;
                 }
+                Ellipse2D.Double marker = new Ellipse2D.Double();
+                Point2D.Double center = xyToPoint(point[0], point[1]);
+                Point2D.Double corner = shiftPoint(center, 5.5, 5.5);
+                marker.setFrameFromCenter(center, corner);
+                canvas.draw(new Line2D.Double(shiftPoint(center, 0, -5.5), shiftPoint(center, 0, 5.5)));
+                canvas.draw(new Line2D.Double(shiftPoint(center, -5.5, 0), shiftPoint(center, 5.5, 0)));
+                canvas.draw(marker);
+                Ellipse2D.Double marker1 = new Ellipse2D.Double();
 
-                java.awt.geom.Ellipse2D.Double marker = new java.awt.geom.Ellipse2D.Double();
-                Point2D center = this.translateXYtoPoint(point[0], point[1]);
-                Point2D corner = new java.awt.geom.Point2D.Double(center.getX() + (double)radius, center.getY() + (double)radius);
+                int temp1 = (int)(point[1] + 0.0);
+                if (temp1 % 2 == 0)
+                {
+                    corner = shiftPoint(center, 6.5, 6.5);
+                    marker1.setFrameFromCenter(center, corner);
+                    canvas.setPaint(Color.GREEN);
+                    canvas.fill(marker1);
+                }
+                canvas.setPaint(Color.RED);
                 marker.setFrameFromCenter(center, corner);
                 if (i == this.selectedMarker) {
                     lastMarker = marker;
@@ -404,5 +430,26 @@ public class GraphicsDisplay extends JPanel {
             }
 
         }
+    }
+    protected Point2D.Double xyToPoint(double x, double y)
+    {
+// Вычисляем смещение X от самой левой точки (minX)
+        double deltaX = x - minX;
+// Вычисляем смещение Y от точки верхней точки (maxY)
+        double deltaY = maxY - y;
+        return new Point2D.Double(deltaX * scale, deltaY * scale);
+    }
+
+    /* Метод-помощник, возвращающий экземпляр класса Point2D.Double
+     * смещѐнный по отношению к исходному на deltaX, deltaY
+     * К сожалению, стандартного метода, выполняющего такую задачу, нет.
+     */
+    protected Point2D.Double shiftPoint(Point2D.Double src, double deltaX, double deltaY)
+    {
+// Инициализировать новый экземпляр точки
+        Point2D.Double dest = new Point2D.Double();
+// Задать еѐ координаты как координаты существующей точки + заданные смещения
+        dest.setLocation(src.getX() + deltaX, src.getY() + deltaY);
+        return dest;
     }
 }
