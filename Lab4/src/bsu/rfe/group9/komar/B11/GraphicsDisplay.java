@@ -1,20 +1,20 @@
 package bsu.rfe.group9.komar.B11;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Paint;
-import java.awt.Stroke;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import javax.swing.JPanel;
-import java.awt.GradientPaint;
+
 
 public class GraphicsDisplay extends JPanel {
     // Список координат точек для построения графика
@@ -40,6 +40,13 @@ public class GraphicsDisplay extends JPanel {
     private BasicStroke markerStroke;
     // Различные шрифты отображения надписей
     private Font axisFont;
+    private double[][] viewport = new double[2][2];
+    private ArrayList<double[][]> undoHistory = new ArrayList(5);
+    private static DecimalFormat formatter = (DecimalFormat) NumberFormat.getInstance();
+    private boolean scaleMode = false;
+    private boolean changeMode = false;
+    private double[] originalPoint = new double[2];
+    private java.awt.geom.Rectangle2D.Double selectionRect = new java.awt.geom.Rectangle2D.Double();
 
     public GraphicsDisplay() {
 // Цвет заднего фона области отображения - белый
@@ -118,7 +125,7 @@ public class GraphicsDisplay extends JPanel {
             }
         }
 
-
+//fixed
 /* Шаг 4 - Определить (исходя из размеров окна) масштабы по осям X
 и Y - сколько пикселов
 * приходится на единицу длины по X и по Y
@@ -330,7 +337,7 @@ minY
         canvas.drawString("minY", (float) (labelPos3.getX() + 40), (float) (labelPos3.getY() - bounds3.getY()));
         Rectangle2D bounds4 = axisFont.getStringBounds("minX", context);
         Point2D.Double labelPos4 = xyToPoint(min1X, 0);
-        canvas.drawString("minX", (float) (labelPos4.getX()), (float) (labelPos4.getY() - bounds4.getY()));
+        canvas.drawString("minX", (float) (labelPos4.getX() - 20), (float) (labelPos4.getY() - bounds4.getY()));
 
     }
 
@@ -362,4 +369,7 @@ minY
         dest.setLocation(src.getX() + deltaX, src.getY() + deltaY);
         return dest;
     }
+
+
+
 }
