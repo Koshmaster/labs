@@ -37,8 +37,8 @@ public class MainFrame extends JFrame
     private final ButtonGroup radioButtons = new ButtonGroup();
     private final ButtonGroup radioMemoryButtons = new ButtonGroup();
 
-    private Box hboxFormulaType = Box.createHorizontalBox();
-    private Box hboxMemoryType = Box.createHorizontalBox();
+    private final Box hboxFormulaType = Box.createHorizontalBox();
+    private final Box hboxMemoryType = Box.createHorizontalBox();
 
     private Double mem1 = 0.0;
     private Double mem2 = 0.0;
@@ -50,7 +50,7 @@ public class MainFrame extends JFrame
     public Double calculate1(Double x, Double y, Double z)
     {
         return (1/Math.sqrt(x)+Math.cos(Math.exp(y))+Math.cos(z*z)) /
-                (Math.pow(Math.log((1+z)*(1+z))+Math.sqrt(Math.exp(Math.cos(y))+Math.pow(Math.sin(Math.PI*x) , 2)), (1/3)));
+                (Math.pow(Math.log((1+z)*(1+z))+Math.sqrt(Math.exp(Math.cos(y))+Math.pow(Math.sin(Math.PI*x) , 2)), (0.33)));
     }
 
     // Формула №2 для рассчѐта
@@ -62,12 +62,7 @@ public class MainFrame extends JFrame
     private void addRadioButton(String buttonName, final int formulaId)
     {
         JRadioButton button = new JRadioButton(buttonName);
-        button.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent ev) {
-                MainFrame.this.formulaId = formulaId;
-            }
-        });
+        button.addActionListener(ev -> MainFrame.this.formulaId = formulaId);
         radioButtons.add(button);
         hboxFormulaType.add(button);
     }
@@ -76,12 +71,7 @@ public class MainFrame extends JFrame
     {
         JRadioButton button = new JRadioButton(buttonName);
 
-        button.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent event) {
-                MainFrame.this.memoryId = memoryId;
-            }
-        });
+        button.addActionListener(event -> MainFrame.this.memoryId = memoryId);
         radioMemoryButtons.add(button);
         hboxMemoryType.add(button);
     }
@@ -138,14 +128,10 @@ public class MainFrame extends JFrame
         Box memory_result = Box.createHorizontalBox();
         memory_result.add(Box.createHorizontalGlue());
         JButton MC=new JButton("MC");
-        MC.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent ev)
-            {
-                if (memoryId == 1)	{mem1 = 0.0; textFieldX.setText("0");}
-                if (memoryId == 2)	{mem2 = 0.0; textFieldY.setText("0");}
-                if (memoryId == 3)	{mem3 = 0.0; textFieldZ.setText("0");}
-            }
+        MC.addActionListener(ev -> {
+            if (memoryId == 1)	{mem1 = 0.0; textFieldX.setText("0");}
+            if (memoryId == 2)	{mem2 = 0.0; textFieldY.setText("0");}
+            if (memoryId == 3)	{mem3 = 0.0; textFieldZ.setText("0");}
         });
 
         JButton M_Plus=new JButton("M+");
@@ -155,7 +141,7 @@ public class MainFrame extends JFrame
             {
                 try
                 {
-                    Double result = Double.parseDouble(textFieldAdd.getText());
+                    double result = Double.parseDouble(textFieldAdd.getText());
 
                     mem1 = Double.parseDouble(textFieldX.getText());
                     mem2 = Double.parseDouble(textFieldY.getText());
@@ -199,41 +185,33 @@ public class MainFrame extends JFrame
 
 // Область для кнопок
         JButton buttonCalc = new JButton("Вычислить");
-        buttonCalc.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent ev)
+        buttonCalc.addActionListener(ev -> {
+            try
             {
-                try
-                {
-                    Double x = Double.parseDouble(textFieldX.getText());
-                    Double y = Double.parseDouble(textFieldY.getText());
-                    Double z = Double.parseDouble(textFieldZ.getText());
-                    Double result;
-                    if (formulaId == 1)
-                        result = calculate1(x, y, z);
-                    else
-                        result = calculate2(x, y, z);
-                    textFieldResult.setText(result.toString());
-                }
-                catch (NumberFormatException ex)
-                {
-                    JOptionPane.showMessageDialog(MainFrame.this,
-                            "Ошибка в формате записи числа с плавающей точкой", "Ошибочный формат числа",
-                            JOptionPane.WARNING_MESSAGE);
-                }
+                Double x = Double.parseDouble(textFieldX.getText());
+                Double y = Double.parseDouble(textFieldY.getText());
+                Double z = Double.parseDouble(textFieldZ.getText());
+                Double result;
+                if (formulaId == 1)
+                    result = calculate1(x, y, z);
+                else
+                    result = calculate2(x, y, z);
+                textFieldResult.setText(result.toString());
+            }
+            catch (NumberFormatException ex)
+            {
+                JOptionPane.showMessageDialog(MainFrame.this,
+                        "Ошибка в формате записи числа с плавающей точкой", "Ошибочный формат числа",
+                        JOptionPane.WARNING_MESSAGE);
             }
         });
         JButton buttonReset = new JButton("Очистить поля");
-        buttonReset.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent ev)
-            {
-                textFieldX.setText("0");
-                textFieldY.setText("0");
-                textFieldZ.setText("0");
-                textFieldAdd.setText("0");
-                textFieldResult.setText("0");
-            }
+        buttonReset.addActionListener(ev -> {
+            textFieldX.setText("0");
+            textFieldY.setText("0");
+            textFieldZ.setText("0");
+            textFieldAdd.setText("0");
+            textFieldResult.setText("0");
         });
 
         Box hboxButtons = Box.createHorizontalBox();
