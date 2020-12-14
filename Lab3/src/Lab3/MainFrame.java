@@ -38,17 +38,16 @@ public class MainFrame extends JFrame
     private JFileChooser fileChooser = null;
 
     private JMenuItem saveToTextMenuItem;
-    private JMenuItem saveToGraphicsMenuItem;
-    private JMenuItem searchValueMenuItem;
-    private JMenuItem aboutMenuItem;
+    private final JMenuItem saveToGraphicsMenuItem;
+    private final JMenuItem searchValueMenuItem;
 
-    private JTextField textFieldFrom;
-    private JTextField textFieldTo;
-    private JTextField textFieldStep;
+    private final JTextField textFieldFrom;
+    private final JTextField textFieldTo;
+    private final JTextField textFieldStep;
 
-    private Box hBoxResult;
+    private final Box hBoxResult;
     // Визуализатор ячеек таблицы
-    private GornerTableCellRenderer renderer = new GornerTableCellRenderer();
+    private final GornerTableCellRenderer renderer = new GornerTableCellRenderer();
     // Модель данных с результатами вычислений
     private GornerTableModel data;
     public MainFrame(Double[] coefficients)
@@ -136,7 +135,7 @@ public class MainFrame extends JFrame
                 JOptionPane.showMessageDialog(MainFrame.this, "Автор: Комар Денис Николаевич, 9 группа");
             }
         };
-        aboutMenuItem = aboutMenu.add(aboutAction);
+        JMenuItem aboutMenuItem = aboutMenu.add(aboutAction);
 
         JLabel labelForFrom = new JLabel("X изменяется на интервале от:");
         textFieldFrom = new JTextField("0.0", 10);
@@ -290,7 +289,7 @@ public class MainFrame extends JFrame
                 if (i != coefficients.length - 1)
                     out.print(" + ");
             }
-            out.println("");
+            out.println(" ");
             out.println("Интервал от " + data.getFrom() + " до " +
                     data.getTo() + " с шагом " + data.getStep());
             out.println("====================================================");
