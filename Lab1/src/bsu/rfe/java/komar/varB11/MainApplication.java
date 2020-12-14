@@ -1,5 +1,5 @@
 package bsu.rfe.java.komar.varB11;
-/*fixed*/
+/*rebuild*/
 
 
 import java.util.*;
@@ -10,7 +10,7 @@ public class MainApplication {
     {
         Food[] breakfast = new Food[20];
         int i = 0;
-        boolean var1, var2;         // случаи для спец параметров, начинающихся с дефиса
+        boolean var1, var2;
         var1 = var2 = false;
         for (String arg : args)
         {
@@ -65,7 +65,7 @@ public class MainApplication {
             {
                 public int compare(Object o2, Object o1)
                 {
-                    if (o2 == null || ((Food)o2).par1.length() > ((Food)o1).par1.length())
+                    if (o2 == null || ((Food)o2).par1.length() > ((Food)o1).par1.length())      // сравнение параметров для сортировки
                     {
                         return 1;
                     }
